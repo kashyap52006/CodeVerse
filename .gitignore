@@ -1,0 +1,74 @@
+# ─────────────────────────────────────────────────────────
+# CodeVerse — .gitignore
+# ─────────────────────────────────────────────────────────
+
+# ─── Environment & Secrets ───────────────────────────────
+.env
+.env.local
+.env.production
+.env.*.local
+
+# ─── Node.js Dependencies ────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# ─── Build Outputs ───────────────────────────────────────
+dist/
+build/
+out/
+.next/
+.nuxt/
+
+# ─── Database ────────────────────────────────────────────
+*.db
+*.sqlite
+*.sqlite3
+prisma/dev.db
+prisma/dev.db-journal
+
+# ─── Logs ────────────────────────────────────────────────
+logs/
+*.log
+pids/
+*.pid
+
+# ─── OS Files ────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ─── Editor / IDE ────────────────────────────────────────
+.vscode/settings.json
+.vscode/launch.json
+.idea/
+*.swp
+*.swo
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# ─── Testing ─────────────────────────────────────────────
+coverage/
+.nyc_output/
+
+# ─── Docker ──────────────────────────────────────────────
+# (docker-compose.yml is tracked, but override files are not)
+docker-compose.override.yml
+
+# ─── Temporary / Cache ───────────────────────────────────
+.cache/
+.temp/
+.tmp/
+tmp/
+temp/
