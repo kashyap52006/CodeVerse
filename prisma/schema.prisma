@@ -1,0 +1,198 @@
+// =============================================================
+// CodeVerse — Prisma Schema
+// =============================================================
+// Database:   PostgreSQL 16.x
+// ORM:        Prisma 5.x
+// Docs:       See docs/DATABASE_SCHEMA.md
+// Diagrams:   See docs/DATABASE_DIAGRAMS.md
+// =============================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// =============================================================
+// ENUMS
+// =============================================================
+
+enum Language {
+  python
+  javascript
+  c
+  cpp
+  java
+}
+
+enum OAuthProvider {
+  google
+  github
+  microsoft
+}
+
+enum ErrorType {
+  CompilationError
+  RuntimeError
+  Timeout
+  MemoryError
+}
+
+// =============================================================
+// USER
+// Central entity. All other tables reference this.
+// Soft-deleted via deletedAt (never hard-deleted).
+// password is nullable for OAuth-only users.
+// =============================================================
+
+model User {
+  id             String    @id @default(uuid()) @db.Uuid
+  email          String    @unique @db.VarChar(255)
+  password       String?   @db.VarChar(255)
+  firstName      String    @db.VarChar(100)
+  lastName       String    @db.VarChar(100)
+  profilePicture String?   @db.VarChar(1024)
+  bio            String?   @db.Text
+  createdAt      DateTime  @default(now()) @db.Timestamptz
+  updatedAt      DateTime  @updatedAt @db.Timestamptz
+  deletedAt      DateTime? @db.Timestamptz
+
+  // Relations
+  snippets         CodeSnippet[]
+  executionHistory ExecutionHistory[]
+  refreshTokens    RefreshToken[]
+  oauthAccounts    OAuthAccount[]
+
+  // Indexes
+  @@index([deletedAt])
+  @@map("User")
+}
+
+// =============================================================
+// CODESNIPPET
+// Stores user-saved code programs.
+// Soft-deleted via deletedAt.
+// tags stored as JSONB array (e.g. ["python", "sorting"]).
+// =============================================================
+
+model CodeSnippet {
+  id          String    @id @default(uuid()) @db.Uuid
+  userId      String    @db.Uuid
+  title       String    @db.VarChar(255)
+  description String?   @db.Text
+  language    Language
+  code        String    @db.Text
+  input       String?   @db.Text
+  tags        Json      @default("[]") @db.JsonB
+  isPublic    Boolean   @default(false)
+  viewCount   Int       @default(0)
+  createdAt   DateTime  @default(now()) @db.Timestamptz
+  updatedAt   DateTime  @updatedAt @db.Timestamptz
+  deletedAt   DateTime? @db.Timestamptz
+
+  // Relations
+  user             User               @relation(fields: [userId], references: [id], onDelete: Restrict)
+  executionHistory ExecutionHistory[]
+
+  // Indexes
+  @@index([userId])
+  @@index([language])
+  @@index([createdAt(sort: Desc)])
+  @@index([userId, deletedAt])
+  @@map("CodeSnippet")
+}
+
+// =============================================================
+// EXECUTIONHISTORY
+// Immutable record of every code execution.
+// Never updated. Never soft-deleted.
+// Stores its own copy of code/input because the snippet
+// may be edited or deleted — history must stay accurate.
+// snippetId is nullable: user may run unsaved code.
+// =============================================================
+
+model ExecutionHistory {
+  id            String     @id @default(uuid()) @db.Uuid
+  userId        String     @db.Uuid
+  snippetId     String?    @db.Uuid
+  language      Language
+  code          String     @db.Text
+  input         String?    @db.Text
+  output        String?    @db.Text
+  stderr        String?    @db.Text
+  success       Boolean
+  exitCode      Int?
+  executionTime Decimal    @default(0) @db.Decimal(10, 3)
+  memory        Int?
+  errorType     ErrorType?
+  createdAt     DateTime   @default(now()) @db.Timestamptz
+
+  // Relations
+  user    User         @relation(fields: [userId], references: [id], onDelete: Restrict)
+  snippet CodeSnippet? @relation(fields: [snippetId], references: [id], onDelete: SetNull)
+
+  // Indexes
+  @@index([userId])
+  @@index([snippetId])
+  @@index([createdAt(sort: Desc)])
+  @@index([userId, createdAt(sort: Desc)])
+  @@map("ExecutionHistory")
+}
+
+// =============================================================
+// REFRESHTOKEN
+// Enables long-lived sessions and safe logout.
+// token stores a SHA-256 hash of the actual token value.
+// isRevoked = true means the token was explicitly invalidated.
+// Expired + revoked tokens are cleaned up weekly.
+// =============================================================
+
+model RefreshToken {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  token     String   @unique @db.VarChar(1024)
+  expiresAt DateTime @db.Timestamptz
+  createdAt DateTime @default(now()) @db.Timestamptz
+  isRevoked Boolean  @default(false)
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Indexes
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("RefreshToken")
+}
+
+// =============================================================
+// OAUTHACCOUNT
+// Links a CodeVerse user to an external OAuth provider.
+// Supports multiple providers per user.
+// accessToken and refreshToken are AES-256-GCM encrypted
+// at the application layer before being stored.
+// UNIQUE(provider, providerUserId): one Google account
+// can only link to one CodeVerse user.
+// =============================================================
+
+model OAuthAccount {
+  id             String        @id @default(uuid()) @db.Uuid
+  userId         String        @db.Uuid
+  provider       OAuthProvider
+  providerUserId String        @db.VarChar(255)
+  accessToken    String        @db.VarChar(1024)
+  refreshToken   String?       @db.VarChar(1024)
+  tokenExpiresAt DateTime?     @db.Timestamptz
+  createdAt      DateTime      @default(now()) @db.Timestamptz
+  updatedAt      DateTime      @updatedAt @db.Timestamptz
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Constraints
+  @@unique([provider, providerUserId])
+  @@index([userId])
+  @@map("OAuthAccount")
+}
