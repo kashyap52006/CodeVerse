@@ -1,69 +1,83 @@
 import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '@/hooks/useAuth'
-import { Button } from '@/components/UI/Button'
-import { getInitials } from '@/utils/formatting'
+import { useState } from 'react'
 
-export function Navigation() {
-  const { isAuthenticated, user, logout } = useAuth()
+export default function Navigation() {
   const navigate = useNavigate()
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
-  const handleLogout = async () => {
-    await logout()
-    navigate('/auth')
+  // Handle logout (remove token and redirect to login)
+  const handleLogout = () => {
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
+    navigate('/login')
+    setIsMenuOpen(false)
   }
 
   return (
-    <header className="sticky top-0 z-50 border-b border-dark-200 bg-white/80 backdrop-blur dark:border-dark-800 dark:bg-dark-950/80">
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-        {/* Logo */}
-        <Link to="/" className="flex items-center gap-2 font-bold text-primary-600">
-          <span className="text-xl">{'<>'}</span>
-          <span className="text-lg tracking-tight">CodeVerse</span>
+    <nav className="bg-blue-600 dark:bg-blue-800 text-white p-4 shadow-lg">
+      <div className="container mx-auto flex justify-between items-center">
+        {/* Logo/Brand */}
+        <Link to="/compiler" className="text-2xl font-bold hover:text-blue-100">
+          CodeVerse
         </Link>
 
-        {/* Nav Links */}
-        {isAuthenticated && (
-          <div className="hidden items-center gap-6 text-sm font-medium sm:flex">
-            <Link
-              to="/compiler"
-              className="text-dark-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400"
-            >
-              Compiler
-            </Link>
-            <Link
-              to="/dashboard"
-              className="text-dark-600 transition-colors hover:text-primary-600 dark:text-dark-300 dark:hover:text-primary-400"
-            >
-              My Snippets
-            </Link>
-          </div>
-        )}
-
-        {/* Auth Controls */}
-        <div className="flex items-center gap-3">
-          {isAuthenticated && user ? (
-            <>
-              <Link to="/profile">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary-600 text-xs font-semibold text-white">
-                  {getInitials(user.firstName, user.lastName)}
-                </div>
-              </Link>
-              <Button variant="ghost" size="sm" onClick={handleLogout}>
-                Logout
-              </Button>
-            </>
-          ) : (
-            <>
-              <Link to="/auth">
-                <Button variant="ghost" size="sm">Log in</Button>
-              </Link>
-              <Link to="/auth?tab=register">
-                <Button variant="primary" size="sm">Sign up</Button>
-              </Link>
-            </>
-          )}
+        {/* Desktop Navigation */}
+        <div className="hidden md:flex gap-6 items-center">
+          <Link to="/compiler" className="hover:text-blue-100 transition">
+            Compiler
+          </Link>
+          <Link to="/dashboard" className="hover:text-blue-100 transition">
+            Dashboard
+          </Link>
+          <Link to="/profile" className="hover:text-blue-100 transition">
+            Profile
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 px-4 py-2 rounded hover:bg-red-600 transition"
+          >
+            Logout
+          </button>
         </div>
-      </nav>
-    </header>
+
+        {/* Mobile menu button */}
+        <button className="md:hidden text-2xl" onClick={() => setIsMenuOpen(!isMenuOpen)}>
+          {isMenuOpen ? '✕' : '☰'}
+        </button>
+      </div>
+
+      {/* Mobile Navigation Menu */}
+      {isMenuOpen && (
+        <div className="md:hidden flex flex-col gap-2 mt-4 pt-4 border-t border-blue-500">
+          <Link
+            to="/compiler"
+            className="hover:text-blue-100 transition py-2"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Compiler
+          </Link>
+          <Link
+            to="/dashboard"
+            className="hover:text-blue-100 transition py-2"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Dashboard
+          </Link>
+          <Link
+            to="/profile"
+            className="hover:text-blue-100 transition py-2"
+            onClick={() => setIsMenuOpen(false)}
+          >
+            Profile
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 px-4 py-2 rounded hover:bg-red-600 transition text-left"
+          >
+            Logout
+          </button>
+        </div>
+      )}
+    </nav>
   )
 }

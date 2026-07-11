@@ -1,20 +1,23 @@
 import type { ReactNode } from 'react'
-import { Navigation } from './Navigation'
-import { Footer } from './Footer'
+import Navigation from './Navigation'
+import Footer from './Footer'
 
 interface LayoutProps {
   children: ReactNode
 }
 
-export function Layout({ children }: LayoutProps) {
+export default function Layout({ children }: LayoutProps) {
   return (
-    <div className="flex min-h-screen flex-col bg-white dark:bg-dark-950">
+    <div className="min-h-screen flex flex-col bg-white dark:bg-gray-900">
+      {/* Navigation at top */}
       <Navigation />
-      <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-7xl">
-          {children}
-        </div>
+
+      {/* Main content */}
+      <main className="flex-1 container mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        {children}
       </main>
+
+      {/* Footer at bottom */}
       <Footer />
     </div>
   )

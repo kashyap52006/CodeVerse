@@ -1,76 +1,55 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
-import { Layout } from '@/components/Layout/Layout'
-import { LoginPage } from '@/pages/LoginPage'
-import { CompilerPage } from '@/pages/CompilerPage'
-import { DashboardPage } from '@/pages/DashboardPage'
-import { ProfilePage } from '@/pages/ProfilePage'
-import { useAuth } from '@/hooks/useAuth'
-import type { ReactNode } from 'react'
-import { Spinner } from '@/components/UI/Spinner'
+import Layout from './components/Layout/Layout'
 
-// ─── Route Guard ──────────────────────────────────────────────
+// Import pages (already created as placeholders)
+import LoginPage from './pages/LoginPage'
+import CompilerPage from './pages/CompilerPage'
+import DashboardPage from './pages/DashboardPage'
+import ProfilePage from './pages/ProfilePage'
 
-function PrivateRoute({ children }: { children: ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth()
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center">
-        <Spinner size="lg" />
-      </div>
-    )
-  }
-  return isAuthenticated ? <>{children}</> : <Navigate to="/auth" replace />
-}
-
-// ─── Router ───────────────────────────────────────────────────
-
+// Create router with all routes
 export const router = createBrowserRouter([
-  {
-    path: '/auth',
-    element: <LoginPage />,
-  },
+  // Root path redirects to compiler
   {
     path: '/',
-    element: (
-      <PrivateRoute>
-        <Layout>
-          <Navigate to="/compiler" replace />
-        </Layout>
-      </PrivateRoute>
-    ),
+    element: <Navigate to="/compiler" replace />,
   },
+
+  // Public routes
+  {
+    path: '/login',
+    element: <LoginPage />,
+  },
+
+  // Protected routes (with Layout)
   {
     path: '/compiler',
     element: (
-      <PrivateRoute>
-        <Layout>
-          <CompilerPage />
-        </Layout>
-      </PrivateRoute>
+      <Layout>
+        <CompilerPage />
+      </Layout>
     ),
   },
   {
     path: '/dashboard',
     element: (
-      <PrivateRoute>
-        <Layout>
-          <DashboardPage />
-        </Layout>
-      </PrivateRoute>
+      <Layout>
+        <DashboardPage />
+      </Layout>
     ),
   },
   {
     path: '/profile',
     element: (
-      <PrivateRoute>
-        <Layout>
-          <ProfilePage />
-        </Layout>
-      </PrivateRoute>
+      <Layout>
+        <ProfilePage />
+      </Layout>
     ),
   },
+
+  // Catch all - redirect to login
   {
     path: '*',
-    element: <Navigate to="/compiler" replace />,
+    element: <Navigate to="/login" replace />,
   },
 ])
