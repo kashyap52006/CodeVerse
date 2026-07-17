@@ -1,15 +1,46 @@
 @import 'tailwindcss';
 
 @theme {
-  /* Custom colors matching tailwind.config.js */
-  --color-primary: #3b82f6;
-  --color-secondary: #1e293b;
+  /* Primary palette */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-300: #93c5fd;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+  --color-primary-800: #1e40af;
+  --color-primary-900: #1e3a8a;
+  --color-primary-950: #172554;
+
+  /* Secondary palette */
+  --color-secondary-50: #f8fafc;
+  --color-secondary-100: #f1f5f9;
+  --color-secondary-200: #e2e8f0;
+  --color-secondary-300: #cbd5e1;
+  --color-secondary-400: #94a3b8;
+  --color-secondary-500: #64748b;
+  --color-secondary-600: #475569;
+  --color-secondary-700: #334155;
+  --color-secondary-800: #1e293b;
+  --color-secondary-900: #0f172a;
+
+  /* Semantic colors */
   --color-success: #10b981;
   --color-error: #ef4444;
   --color-warning: #f59e0b;
+  --color-info: #0ea5e9;
 
   /* Font family */
-  --font-sans: 'Inter', sans-serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Spacing */
+  --spacing-128: 32rem;
+
+  /* Animations */
+  --animate-spin-slow: spin 3s linear infinite;
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
 @layer base {
@@ -18,24 +49,248 @@
   }
 
   body {
-    @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors;
+    @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors duration-300;
+    font-family: var(--font-sans);
   }
 
   a {
-    @apply text-blue-600 dark:text-blue-400 hover:underline;
+    @apply text-primary-600 dark:text-primary-400 hover:underline transition-colors;
+  }
+
+  code {
+    @apply font-mono text-sm bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded;
+  }
+
+  pre {
+    @apply bg-gray-100 dark:bg-gray-800 p-4 rounded-lg overflow-x-auto;
   }
 }
 
+/*
+ * Base button mixin — inlined directly into every variant
+ * (Tailwind v4 disallows @apply of user-defined component classes)
+ */
 @layer components {
+  /* Layout */
   .container-max {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
 
+  .section-padding {
+    @apply py-8 sm:py-12 md:py-16;
+  }
+
+  /* Typography */
+  .text-hero {
+    @apply text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight;
+  }
+
+  .text-title {
+    @apply text-3xl sm:text-4xl font-bold;
+  }
+
+  .text-subtitle {
+    @apply text-xl sm:text-2xl font-semibold;
+  }
+
+  /* ──── CARDS ──── */
+  .card {
+    @apply bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-lg transition-shadow p-6;
+  }
+
+  .card-compact {
+    @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4;
+  }
+
+  /* ──── BUTTONS ──── */
+  /* Each variant fully inlines the base btn styles (no @apply btn) */
   .btn-primary {
-    @apply bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded transition;
+    @apply inline-flex items-center justify-center font-semibold py-2 px-4 rounded-lg
+           transition-all duration-200 cursor-pointer
+           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500
+           disabled:opacity-50 disabled:cursor-not-allowed
+           bg-primary-600 hover:bg-primary-700 text-white shadow-sm hover:shadow-md;
   }
 
   .btn-secondary {
-    @apply bg-gray-300 hover:bg-gray-400 text-gray-900 font-semibold py-2 px-4 rounded transition;
+    @apply inline-flex items-center justify-center font-semibold py-2 px-4 rounded-lg
+           transition-all duration-200 cursor-pointer
+           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500
+           disabled:opacity-50 disabled:cursor-not-allowed
+           bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600
+           text-gray-900 dark:text-gray-100;
   }
+
+  .btn-danger {
+    @apply inline-flex items-center justify-center font-semibold py-2 px-4 rounded-lg
+           transition-all duration-200 cursor-pointer
+           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500
+           disabled:opacity-50 disabled:cursor-not-allowed
+           bg-error hover:bg-red-600 text-white;
+  }
+
+  .btn-success {
+    @apply inline-flex items-center justify-center font-semibold py-2 px-4 rounded-lg
+           transition-all duration-200 cursor-pointer
+           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500
+           disabled:opacity-50 disabled:cursor-not-allowed
+           bg-success hover:bg-green-600 text-white;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center font-semibold py-2 px-4 rounded-lg
+           transition-all duration-200 cursor-pointer
+           focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500
+           disabled:opacity-50 disabled:cursor-not-allowed
+           border-2 border-primary-600 dark:border-primary-400
+           text-primary-600 dark:text-primary-400
+           hover:bg-primary-50 dark:hover:bg-primary-950;
+  }
+
+  .btn-sm {
+    @apply py-1 px-3 text-sm;
+  }
+
+  .btn-lg {
+    @apply py-3 px-6 text-lg;
+  }
+
+  .btn-block {
+    @apply w-full;
+  }
+
+  /* ──── FORMS ──── */
+  .input {
+    @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
+           bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+           placeholder-gray-400 dark:placeholder-gray-500
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
+           transition-all;
+  }
+
+  .input-error {
+    @apply border-error focus:ring-error;
+  }
+
+  .textarea {
+    @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg
+           bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 font-mono
+           focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent
+           transition-all resize-none;
+  }
+
+  /* ──── ALERTS ──── */
+  .alert {
+    @apply p-4 rounded-lg flex gap-3 items-start;
+  }
+
+  .alert-info {
+    @apply p-4 rounded-lg flex gap-3 items-start
+           bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-200
+           border border-blue-200 dark:border-blue-800;
+  }
+
+  .alert-success {
+    @apply p-4 rounded-lg flex gap-3 items-start
+           bg-green-50 dark:bg-green-900/30 text-green-800 dark:text-green-200
+           border border-green-200 dark:border-green-800;
+  }
+
+  .alert-warning {
+    @apply p-4 rounded-lg flex gap-3 items-start
+           bg-yellow-50 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-200
+           border border-yellow-200 dark:border-yellow-800;
+  }
+
+  .alert-error {
+    @apply p-4 rounded-lg flex gap-3 items-start
+           bg-red-50 dark:bg-red-900/30 text-red-800 dark:text-red-200
+           border border-red-200 dark:border-red-800;
+  }
+
+  /* ──── BADGES ──── */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold;
+  }
+
+  .badge-primary {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold
+           bg-primary-100 dark:bg-primary-900/30 text-primary-800 dark:text-primary-200;
+  }
+
+  .badge-success {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold
+           bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-200;
+  }
+
+  .badge-error {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold
+           bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-200;
+  }
+
+  /* ──── SPINNER ──── */
+  .spinner {
+    @apply inline-block rounded-full border-2 border-solid border-current border-r-transparent animate-spin;
+  }
+}
+
+@layer utilities {
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  .flex-between {
+    @apply flex items-center justify-between;
+  }
+
+  .truncate-2 {
+    @apply line-clamp-2;
+  }
+
+  .truncate-3 {
+    @apply line-clamp-3;
+  }
+
+  .gradient-primary {
+    @apply bg-gradient-to-br from-primary-500 to-primary-700;
+  }
+
+  .border-top {
+    @apply border-t border-gray-200 dark:border-gray-700;
+  }
+
+  .border-bottom {
+    @apply border-b border-gray-200 dark:border-gray-700;
+  }
+}
+
+/* ──── CUSTOM SCROLLBAR ──── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #475569;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
 }

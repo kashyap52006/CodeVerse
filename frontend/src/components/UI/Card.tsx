@@ -1,6 +1,15 @@
-// Card will be completed in Prompt 7
-import type { ReactNode } from 'react';
+import { ReactNode } from 'react'
 
-export function Card({ children }: { children: ReactNode }) {
-  return <div className="rounded-xl border bg-white p-6 dark:bg-gray-900">{children}</div>;
+interface CardProps {
+  children: ReactNode
+  className?: string
+  compact?: boolean
+}
+
+export default function Card({ children, className = '', compact = false }: CardProps) {
+  return (
+    <div className={[compact ? 'card-compact' : 'card', className].filter(Boolean).join(' ')}>
+      {children}
+    </div>
+  )
 }

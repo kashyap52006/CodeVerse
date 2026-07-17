@@ -1,14 +1,19 @@
 import { useNavigate } from 'react-router-dom'
-import LoginForm from '../components/Forms/LoginForm'
+import RegisterForm from '../components/Forms/RegisterForm'
 import Card from '../components/UI/Card'
 import { useAuth } from '../hooks/useAuth'
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const navigate = useNavigate()
-  const { login, isLoading } = useAuth()
+  const { register, isLoading } = useAuth()
 
-  const handleSubmit = async (email: string, password: string) => {
-    await login(email, password)
+  const handleSubmit = async (
+    email: string,
+    password: string,
+    firstName: string,
+    lastName: string,
+  ) => {
+    await register(email, password, firstName, lastName)
     navigate('/compiler')
   }
 
@@ -26,14 +31,14 @@ export default function LoginPage() {
         </div>
 
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-          Sign In
+          Create Account
         </h2>
 
-        <LoginForm onSubmit={handleSubmit} isLoading={isLoading} />
+        <RegisterForm onSubmit={handleSubmit} isLoading={isLoading} />
 
         <div className="mt-6 pt-5 border-top">
           <p className="text-xs text-center text-gray-400 dark:text-gray-500">
-            By signing in, you agree to our{' '}
+            By creating an account, you agree to our{' '}
             <a href="#" className="hover:underline">Terms of Service</a>
             {' '}and{' '}
             <a href="#" className="hover:underline">Privacy Policy</a>

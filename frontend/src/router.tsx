@@ -1,15 +1,16 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import Layout from './components/Layout/Layout'
+import ProtectedRoute from './components/ProtectedRoute'
 
-// Import pages (already created as placeholders)
+// Pages
 import LoginPage from './pages/LoginPage'
+import RegisterPage from './pages/RegisterPage'
 import CompilerPage from './pages/CompilerPage'
 import DashboardPage from './pages/DashboardPage'
 import ProfilePage from './pages/ProfilePage'
 
-// Create router with all routes
 export const router = createBrowserRouter([
-  // Root path redirects to compiler
+  // Root redirect
   {
     path: '/',
     element: <Navigate to="/compiler" replace />,
@@ -20,34 +21,44 @@ export const router = createBrowserRouter([
     path: '/login',
     element: <LoginPage />,
   },
+  {
+    path: '/register',
+    element: <RegisterPage />,
+  },
 
-  // Protected routes (with Layout)
+  // Protected routes — wrapped with ProtectedRoute + Layout
   {
     path: '/compiler',
     element: (
-      <Layout>
-        <CompilerPage />
-      </Layout>
+      <ProtectedRoute>
+        <Layout>
+          <CompilerPage />
+        </Layout>
+      </ProtectedRoute>
     ),
   },
   {
     path: '/dashboard',
     element: (
-      <Layout>
-        <DashboardPage />
-      </Layout>
+      <ProtectedRoute>
+        <Layout>
+          <DashboardPage />
+        </Layout>
+      </ProtectedRoute>
     ),
   },
   {
     path: '/profile',
     element: (
-      <Layout>
-        <ProfilePage />
-      </Layout>
+      <ProtectedRoute>
+        <Layout>
+          <ProfilePage />
+        </Layout>
+      </ProtectedRoute>
     ),
   },
 
-  // Catch all - redirect to login
+  // Catch-all → redirect to login
   {
     path: '*',
     element: <Navigate to="/login" replace />,
